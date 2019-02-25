@@ -1,12 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse, Http404
 from django.template import loader
 # Create your views here.
 
 
 
 def index(request):
-    # using the HttpResponse() method
+    # Returning the HttpResponse() method
     """
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
     template = loader.get_template('polls/index.html')
@@ -15,13 +15,23 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
     """
-    # using the render() shortcut, we don't need to import HttpResponse
+    # Returning the render() shortcut, we don't need to import HttpResponse
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
     context = {'latest_question_list': latest_question_list}
     return render(request, 'polls/index.html', context)
 
 def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
+    # Using a try except to handle DoesNotExist errors
+    """
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist:
+        raise Http404("Question does not exist")
+    return render(request, 'polls/detail.html', {'question': question})
+    """
+    # Using get_object_or_404 shortcut
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, 'polls/detail.html', {'question': question})
 
 def results(request, question_id):
     response = "You're looking at the results of question %s."
